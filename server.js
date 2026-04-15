@@ -1,22 +1,25 @@
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-import { streamText } from 'ai';
+export default async function handler(req, res) {
+  // 1. Set the NVIDIA endpoint
+  const NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
 
-// Setup the NVIDIA NIM provider
-const nim = createOpenAICompatible({
-  name: 'nvidia-nim',
-  baseURL: 'https://integrate.api.nvidia.com/v1',
-  headers: {
-    Authorization: `Bearer ${process.env.NVIDIA_API_KEY}`,
-  },
-});
+  // 2. Extract the body from Janitor AI's request
+  const body = req.body;
 
-export async function POST(req: Request) {
-  const { messages } = await req.json();
+  try {
+    const response = await fetch(NVIDIA_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.NVIDIA_API_KEY}`, // Your key hidden in Vercel
+      },
+      body: JSON.stringify(body),
+    });
 
-  const result = await streamText({
-    model: nim.chatModel('meta/llama-3.1-8b-instruct'), // Or your preferred NIM model
-    messages,
-  });
-
-  return result.toDataStreamResponse();
+    const data = await response.json();
+    
+    // 3. Send the AI response back to Janitor AI
+    res.status(response.status).json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to connect to NVIDIA NIM" });
+  }
 }
