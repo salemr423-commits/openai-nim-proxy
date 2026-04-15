@@ -10,7 +10,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.NVIDIA_API_KEY}`, //  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
+        "Authorization": `Bearer ${process.env.NVIDIA_API_KEY}`, 4OvWz_1SgoFjYP11Zpg8LipxZlzowj
       },
       body: JSON.stringify(body),
     });
